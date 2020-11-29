@@ -64,6 +64,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\Scenes\Scripts\Reset.cs" />
+    <Compile Include="Assets\Scripts\ChangeSpeed.cs" />
     <Compile Include="Assets\Scripts\WallsCollision.cs" />
     <Compile Include="Assets\Scripts\physics.cs" />
     <Reference Include="Unity.Timeline.Editor">

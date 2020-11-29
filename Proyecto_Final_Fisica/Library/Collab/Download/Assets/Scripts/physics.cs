@@ -27,12 +27,16 @@ public class physics : MonoBehaviour
     public GameObject pname2;
     public GameObject pname3;
 
+    //Campo para voltaje
+    public GameObject voltajeField;
 
     private double efieldMagnitud;
     private double mfieldMagnitud;
     private double q;
     private double e;
     private double m;
+    private double voltaje;
+    private double B;
 
     //Componentes para el calculo de la masa de la particula customizable
     private double unknown_mass;
@@ -46,21 +50,42 @@ public class physics : MonoBehaviour
 
     Vector2 vin = new Vector2(0, -1);
 
-    void Start()
-    {
+    void Start(){
         e = 1.60217646 * (Math.Pow(10, -19));
-
+        B = 10.0e16;
     }
 
-    void Update()
-    {
+    void Update(){}
 
+    private void FixedUpdate() {
+        if (clone1) {
+            double eForce = 0;
+            if (clone1.transform.position.y > -1.0) {
+                eForce = (efieldMagnitud * q);
+            }
+            //double mForce = -q * (B * clone1.GetComponent<Rigidbody2D>().velocity.magnitude);
+            Debug.Log(eForce);
+            clone1.GetComponent<Rigidbody2D>().AddForce(new Vector2((float)(eForce + 0), 0), ForceMode2D.Impulse);
+        }
+
+        if (clone2) {
+            double eForce = 0;
+            if (clone2.transform.position.y < -1.0) {
+                eForce = (efieldMagnitud * q);
+            }
+            double mForce = -q * (B * clone2.GetComponent<Rigidbody2D>().velocity.magnitude);
+            clone2.GetComponent<Rigidbody2D>().AddForce(new Vector2((float)(eForce+mForce), 0), ForceMode2D.Impulse);
+        }
+
+        if (clone3) { }
     }
 
 
 
     public void generate()
     {
+        voltaje = double.Parse(voltajeField.GetComponent<Text>().text);
+        mfieldMagnitud = voltaje / 0.1;
 
         string nameTxt1 = pname1.GetComponent<Text>().text;
         string nameTxt2 = pname2.GetComponent<Text>().text;
@@ -71,28 +96,25 @@ public class physics : MonoBehaviour
 
         clone1 = instantiateParticle(nameTxt1);
         clone1.GetComponent<Rigidbody2D>().velocity = new Vector2(0, -rand_num);
-        clone1.GetComponent<Rigidbody>().position = new Vector3(3f, 5f, 73.38874f);
 
-        if (nameTxt2 != "None")
+        if (!String.Equals(nameTxt2, "None"))
         {
             clone2 = instantiateParticle(nameTxt2);
-            clone2.GetComponent<Rigidbody>().position = new Vector3(3f, 5f, 73.38874f);
         }
 
-        if (nameTxt3 != "None")
+        if (!String.Equals(nameTxt3, "None"))
         {
             clone3 = instantiateParticle(nameTxt3);
-            clone3.GetComponent<Rigidbody>().position = new Vector3(3f, 5f, 73.38874f);
         }
 
     }
 
     public double createMass()
     {
-        if (protonNumberInput.GetComponent<Text>().text.Length != 0 || neutronNumberInput.GetComponent<Text>().text.Length != 0)
+        if (protonNumberInput.GetComponent<InputField>().text.Length != 0 || neutronNumberInput.GetComponent<InputField>().text.Length != 0)
         {
-            double.TryParse(protonNumberInput.GetComponent<Text>().text, out unknownProton);
-            double.TryParse(neutronNumberInput.GetComponent<Text>().text, out unknownNeutron);
+            double.TryParse(protonNumberInput.GetComponent<InputField>().text, out unknownProton);
+            double.TryParse(neutronNumberInput.GetComponent<InputField>().text, out unknownNeutron);
             unknown_mass = (unknownProton * 1.6727E-24) + (unknownNeutron * 1.6750E-24);
         }
         return unknown_mass;
@@ -100,9 +122,9 @@ public class physics : MonoBehaviour
 
     public double calculateEnergy()
     {
-        if (protonNumberInput.GetComponent<Text>().text.Length != 0 || neutronNumberInput.GetComponent<Text>().text.Length != 0)
+        if (protonNumberInput.GetComponent<InputField>().text.Length != 0 || neutronNumberInput.GetComponent<InputField>().text.Length != 0)
         {
-            double.TryParse(protonNumberInput.GetComponent<Text>().text, out unknownProton);
+            double.TryParse(protonNumberInput.GetComponent<InputField>().text, out unknownProton);
             unknown_energy = unknownProton * e;
         }
         return unknown_energy;
@@ -114,7 +136,7 @@ public class physics : MonoBehaviour
         switch (nameTxt)
         {
             case "Alpha":
-                q = -e;
+                q = 2*e;
                 prefabParticle = alpha;
                 m = 6.64466e-27;
                 break;
