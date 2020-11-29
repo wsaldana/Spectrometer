@@ -32,8 +32,12 @@ public class physics : MonoBehaviour {
     private double efieldMagnitud;
     private double mfieldMagnitud;
     private double q;
+    private double q2;
+    private double q3;
     private double e;
     private double m;
+    private double m2;
+    private double m3;
     private double voltaje;
     private double B;
     private double B1;
@@ -95,13 +99,13 @@ public class physics : MonoBehaviour {
         if (clone2) {
             if (clone2.transform.position.y > -1.0) {
                 v_f = clone2.GetComponent<Rigidbody2D>().velocity.magnitude;
-                double eForce = (efieldMagnitud * q);
-                double mForce = -q * (B * v_f);
+                double eForce = (efieldMagnitud * q2);
+                double mForce = -q2 * (B * v_f);
                 clone2.GetComponent<Rigidbody2D>().AddForce(new Vector2((float)(eForce + mForce), 0), ForceMode2D.Impulse);
             } else {
                 clone2.GetComponent<Rigidbody2D>().velocity = Vector2.zero;
                 t2 += Time.deltaTime;
-                double R = (m * v_f) / (q * B1);
+                double R = (m2 * v_f) / (q2 * B1);
                 Debug.Log(R);
                 double x_pos = R * Math.Cos(t2 * v_f);
                 double y_pos = -R * Math.Sin(t2 * v_f);
@@ -112,13 +116,13 @@ public class physics : MonoBehaviour {
         if (clone3) {
             if (clone3.transform.position.y > -1.0) {
                 v_f = clone3.GetComponent<Rigidbody2D>().velocity.magnitude;
-                double eForce = (efieldMagnitud * q);
-                double mForce = -q * (B * v_f);
+                double eForce = (efieldMagnitud * q3);
+                double mForce = -q3 * (B * v_f);
                 clone3.GetComponent<Rigidbody2D>().AddForce(new Vector2((float)(eForce + mForce), 0), ForceMode2D.Impulse);
             } else {
                 clone3.GetComponent<Rigidbody2D>().velocity = Vector2.zero;
                 t3 += Time.deltaTime;
-                double R = (m * v_f) / (q * B1);
+                double R = (m3 * v_f) / (q3 * B1);
                 Debug.Log(R);
                 double x_pos = R * Math.Cos(t3 * v_f);
                 double y_pos = -R * Math.Sin(t3 * v_f);
@@ -142,18 +146,18 @@ public class physics : MonoBehaviour {
         int rand_num2 = rd.NextInt(10, 20);
         int rand_num3 = rd.NextInt(10, 20);
 
-        clone1 = instantiateParticle(nameTxt1);
+        clone1 = instantiateParticle(nameTxt1, 1);
         clone1.GetComponent<Rigidbody2D>().velocity = new Vector2(0, -rand_num);
         Physics2D.IgnoreCollision(clone1.GetComponent<Collider2D>(), clone1.GetComponent<Collider2D>());
 
         if (!String.Equals(nameTxt2, "None")) {
-            clone2 = instantiateParticle(nameTxt2);
+            clone2 = instantiateParticle(nameTxt2, 2);
             clone2.GetComponent<Rigidbody2D>().velocity = new Vector2(0, -rand_num2);
             Physics2D.IgnoreCollision(clone1.GetComponent<Collider2D>(), clone2.GetComponent<Collider2D>());
         }
 
         if (!String.Equals(nameTxt3, "None")) {
-            clone3 = instantiateParticle(nameTxt3);
+            clone3 = instantiateParticle(nameTxt3, 3);
             clone3.GetComponent<Rigidbody2D>().velocity = new Vector2(0, -rand_num3);
             Physics2D.IgnoreCollision(clone1.GetComponent<Collider2D>(), clone3.GetComponent<Collider2D>());
             Physics2D.IgnoreCollision(clone2.GetComponent<Collider2D>(), clone3.GetComponent<Collider2D>());
@@ -177,49 +181,61 @@ public class physics : MonoBehaviour {
         return unknown_energy;
     }
 
-    public GameObject instantiateParticle(String nameTxt) {
+    public GameObject instantiateParticle(String nameTxt, int num) {
         GameObject prefabParticle;
+        double q0 = 0.0;
+        double m0 = 0.0;
         switch (nameTxt) {
             case "Alpha":
-                q = 2 * e;
+                q0 = 2 * e;
                 prefabParticle = alpha;
-                m = 6.64466e-27;
+                m0 = 6.64466e-27;
                 break;
             case "Electron":
                 prefabParticle = electron;
-                q = -e;
-                m = 9.10938e-31;
+                q0 = -e;
+                m0 = 9.10938e-31;
                 break;
             case "Tauon":
                 prefabParticle = tau;
-                q = -e;
-                m = 3.167e-27;
+                q0 = -e;
+                m0 = 3.167e-27;
                 break;
             case "Neutron":
                 prefabParticle = neutron;
-                q = 0.0;
-                m = 1.67493e-27;
+                q0 = 0.0;
+                m0 = 1.67493e-27;
                 break;
             case "Proton":
                 prefabParticle = proton;
-                q = e;
-                m = 1.67262e-27;
+                q0 = e;
+                m0 = 1.67262e-27;
                 break;
             case "Quark":
                 prefabParticle = quark;
-                q = -e / 3;
-                m = 2.26398e-27;
+                q0 = -e / 3;
+                m0 = 2.26398e-27;
                 break;
             case "Positron":
                 prefabParticle = positron;
-                q = 2 * e / 3;
-                m = 9.10938e-31;
+                q0 = 2 * e / 3;
+                m0 = 9.10938e-31;
                 break;
             default:
                 prefabParticle = unknow;
-                q = calculateEnergy();
-                m = createMass();
+                q0 = calculateEnergy();
+                m0 = createMass();
                 break;
+        }
+        if (num == 1) {
+            q = q0;
+            m = m0;
+        } else if (num == 2) {
+            q2 = q0;
+            m2 = m0;
+        } else if (num == 3) {
+            q3 = q0;
+            m3 = m0;
         }
         return Instantiate(prefabParticle, new Vector2(3.27f, 4.47f), Quaternion.identity) as GameObject;
     }
